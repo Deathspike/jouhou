@@ -97,11 +97,11 @@ namespace Jouhou {
 		/// Execute a command and retrieve the result set.
 		/// </summary>
 		/// <param name="DbCommand">The command.</param>
-		public static async Task<IList<T>> ToResultSet<T>(this DbCommand DbCommand) where T : class, new() {
+		public static async Task<List<T>> ToResultSet<T>(this DbCommand DbCommand) where T : class, new() {
 			// Execute the reader and wait for the result.
 			using (DbDataReader DataReader = await DbCommand.ExecuteReaderAsync()) {
 				// Initialize a new instance of the List class.
-				IList<T> Result = new List<T>();
+				List<T> Result = new List<T>();
 				// Initialize the single variable.
 				T Single;
 				// Iterate while the result is valid.
@@ -118,11 +118,11 @@ namespace Jouhou {
 		/// Execute a command and retrieve the result set.
 		/// </summary>
 		/// <param name="DbCommand">The command.</param>
-		public static async Task<IList<dynamic>> ToResultSet(this DbCommand DbCommand) {
+		public static async Task<List<dynamic>> ToResultSet(this DbCommand DbCommand) {
 			// Execute the reader and wait for the result.
 			using (DbDataReader DataReader = await DbCommand.ExecuteReaderAsync()) {
 				// Initialize a new instance of the List class.
-				IList<dynamic> Result = new List<dynamic>();
+				List<dynamic> Result = new List<dynamic>();
 				// Initialize the single variable.
 				object Single;
 				// Iterate while the result is valid.

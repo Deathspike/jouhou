@@ -320,7 +320,7 @@ namespace Jouhou {
 		/// <summary>
 		/// Execute a query and retrieve the result set.
 		/// </summary>
-		public async Task<IList<T>> ToResultSet() {
+		public async Task<List<T>> ToResultSet() {
 			// Execute a query and retrieve the result set.
 			return await ToResultSet(null);
 		}
@@ -330,7 +330,7 @@ namespace Jouhou {
 		/// </summary>
 		/// <param name="Query">The query.</param>
 		/// <param name="Arguments">The arguments.</param>
-		public async Task<IList<T>> ToResultSet(string Query, params object[] Arguments) {
+		public async Task<List<T>> ToResultSet(string Query, params object[] Arguments) {
 			// Check if the connection is valid.
 			if (await _CheckConnection()) {
 				// Check if the query is invalid.

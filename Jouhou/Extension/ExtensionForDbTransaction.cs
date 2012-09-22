@@ -99,7 +99,7 @@ namespace Jouhou {
 		/// <param name="DbTransaction">The transaction.</param>
 		/// <param name="Query">The query.</param>
 		/// <param name="Arguments">The arguments.</param>
-		public static async Task<IList<T>> ToResultSet<T>(this DbTransaction DbTransaction, string Query, params object[] Arguments) where T : class, new() {
+		public static async Task<List<T>> ToResultSet<T>(this DbTransaction DbTransaction, string Query, params object[] Arguments) where T : class, new() {
 			// Create and return a command associated with the current connection.
 			using (DbCommand Command = DbTransaction.CreateCommand(Query, Arguments)) {
 				// Execute a command and retrieve the result set.
@@ -113,7 +113,7 @@ namespace Jouhou {
 		/// <param name="DbTransaction">The transaction.</param>
 		/// <param name="Query">The query.</param>
 		/// <param name="Arguments">The arguments.</param>
-		public static async Task<IList<dynamic>> ToResultSet(this DbTransaction DbTransaction, string Query, params object[] Arguments) {
+		public static async Task<List<dynamic>> ToResultSet(this DbTransaction DbTransaction, string Query, params object[] Arguments) {
 			// Create and return a command associated with the current connection.
 			using (DbCommand Command = DbTransaction.CreateCommand(Query, Arguments)) {
 				// Execute a command and retrieve the result set.
