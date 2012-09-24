@@ -77,7 +77,7 @@ namespace Jouhou {
 			// Execute the reader and wait for the result.
 			using (DbDataReader DataReader = await DbCommand.ExecuteReaderAsync()) {
 				// Retrieve a result.
-				return await DataReader.ToResult<T>();
+				return await DataReader.ReadAsync() ? DataReader.ToResult<T>() : null;
 			}
 		}
 
@@ -89,7 +89,7 @@ namespace Jouhou {
 			// Execute the reader and wait for the result.
 			using (DbDataReader DataReader = await DbCommand.ExecuteReaderAsync()) {
 				// Retrieve a result.
-				return await DataReader.ToResult();
+				return await DataReader.ReadAsync() ? DataReader.ToResult() : null;
 			}
 		}
 
@@ -102,12 +102,10 @@ namespace Jouhou {
 			using (DbDataReader DataReader = await DbCommand.ExecuteReaderAsync()) {
 				// Initialize a new instance of the List class.
 				List<T> Result = new List<T>();
-				// Initialize the single variable.
-				T Single;
-				// Iterate while the result is valid.
-				while ((Single = await DataReader.ToResult<T>()) != null) {
+				// Read values from the data reader.
+				while (await DataReader.ReadAsync()) {
 					// Add the result to the result set.
-					Result.Add(Single);
+					Result.Add(DataReader.ToResult<T>());
 				}
 				// Return the result.
 				return Result;
@@ -122,13 +120,11 @@ namespace Jouhou {
 			// Execute the reader and wait for the result.
 			using (DbDataReader DataReader = await DbCommand.ExecuteReaderAsync()) {
 				// Initialize a new instance of the List class.
-				List<dynamic> Result = new List<dynamic>();
-				// Initialize the single variable.
-				object Single;
-				// Iterate while the result is valid.
-				while ((Single = await DataReader.ToResult()) != null) {
+				List<object> Result = new List<object>();
+				// Read values from the data reader.
+				while (await DataReader.ReadAsync()) {
 					// Add the result to the result set.
-					Result.Add(Single);
+					Result.Add(DataReader.ToResult());
 				}
 				// Return the result.
 				return Result;
