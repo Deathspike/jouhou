@@ -12,100 +12,76 @@ namespace Jouhou {
 	/// </summary>
 	public static class ExtensionForDbCommand {
 		/// <summary>
-		/// Add an arguments to the command.
+		/// Add an argument to the command.
 		/// </summary>
-		/// <param name="DbCommand">The command.</param>
+		/// <param name="Command">The command.</param>
 		/// <param name="Argument">The argument.</param>
-		public static void Add(this DbCommand DbCommand, object Argument) {
+		public static void Add(this DbCommand Command, object Argument) {
 			// Create a parameter.
-			DbParameter DbParameter = DbCommand.CreateParameter();
+			DbParameter Parameter = Command.CreateParameter();
 			// Set the name of the parameter.
-			DbParameter.ParameterName = "@" + DbCommand.Parameters.Count;
+			Parameter.ParameterName = "@" + Command.Parameters.Count;
 			// Check if the object is null.
 			if (Argument == null) {
 				// Set the value of the parameter.
-				DbParameter.Value = DBNull.Value;
+				Parameter.Value = DBNull.Value;
 			} else {
 				// Retrieve the argument type.
 				Type Type = Argument.GetType();
 				// Check the object type.
 				if (Type == typeof(Guid)) {
 					// Set the database type of the value.
-					DbParameter.DbType = DbType.String;
+					Parameter.DbType = DbType.String;
 					// Set the maximum size of the data in the column.
-					DbParameter.Size = 4000;
+					Parameter.Size = 4000;
 					// Set the value of the parameter.
-					DbParameter.Value = Argument.ToString();
+					Parameter.Value = Argument.ToString();
 				} else if (Type == typeof(ExpandoObject)) {
 					// Set the value of the parameter.
-					DbParameter.Value = ((IDictionary<string, object>) Argument).Values.FirstOrDefault();
+					Parameter.Value = ((IDictionary<string, object>) Argument).Values.FirstOrDefault();
 				} else if (Type == typeof(string)) {
 					// Set the maximum size of the data in the column.
-					DbParameter.Size = ((string) Argument).Length > 4000 ? -1 : 4000;
+					Parameter.Size = ((string) Argument).Length > 4000 ? -1 : 4000;
 					// Set the value of the parameter.
-					DbParameter.Value = Argument;
+					Parameter.Value = Argument;
 				} else {
 					// Set the value of the parameter.
-					DbParameter.Value = Argument;
+					Parameter.Value = Argument;
 				}
 			}
 			// Add the parameter to the command.
-			DbCommand.Parameters.Add(DbParameter);
+			Command.Parameters.Add(Parameter);
 		}
 
 		/// <summary>
 		/// Add a number of arguments to the command.
 		/// </summary>
-		/// <param name="DbCommand">The command.</param>
+		/// <param name="Command">The command.</param>
 		/// <param name="Arguments">The arguments.</param>
-		public static void Add(this DbCommand DbCommand, params object[] Arguments) {
+		public static void Add(this DbCommand Command, params object[] Arguments) {
 			// Check if an argument is available.
 			if (Arguments != null) {
 				// Iterate through each argument.
 				foreach (object Argument in Arguments) {
 					// Add an arguments to the command.
-					DbCommand.Add(Argument);
+					Command.Add(Argument);
 				}
-			}
-		}
-
-		/// <summary>
-		/// Execute a command and retrieve a result.
-		/// </summary>
-		/// <param name="DbCommand">The command.</param>
-		public static async Task<T> ToResult<T>(this DbCommand DbCommand) where T : class, new() {
-			// Execute the reader and wait for the result.
-			using (DbDataReader DataReader = await DbCommand.ExecuteReaderAsync()) {
-				// Retrieve a result.
-				return await DataReader.ReadAsync() ? DataReader.ToResult<T>() : null;
-			}
-		}
-
-		/// <summary>
-		/// Execute a command and retrieve a result.
-		/// </summary>
-		/// <param name="DbCommand">The command.</param>
-		public static async Task<object> ToResult(this DbCommand DbCommand) {
-			// Execute the reader and wait for the result.
-			using (DbDataReader DataReader = await DbCommand.ExecuteReaderAsync()) {
-				// Retrieve a result.
-				return await DataReader.ReadAsync() ? DataReader.ToResult() : null;
 			}
 		}
 
 		/// <summary>
 		/// Execute a command and retrieve the result set.
 		/// </summary>
-		/// <param name="DbCommand">The command.</param>
-		public static async Task<List<T>> ToResultSet<T>(this DbCommand DbCommand) where T : class, new() {
+		/// <param name="Command">The command.</param>
+		public static async Task<List<T>> AllAsync<T>(this DbCommand Command) where T : class, new() {
 			// Execute the reader and wait for the result.
-			using (DbDataReader DataReader = await DbCommand.ExecuteReaderAsync()) {
+			using (DbDataReader DataReader = await Command.ExecuteReaderAsync()) {
 				// Initialize a new instance of the List class.
 				List<T> Result = new List<T>();
 				// Read values from the data reader.
 				while (await DataReader.ReadAsync()) {
 					// Add the result to the result set.
-					Result.Add(DataReader.ToResult<T>());
+					Result.Add(DataReader.Single<T>());
 				}
 				// Return the result.
 				return Result;
@@ -115,19 +91,43 @@ namespace Jouhou {
 		/// <summary>
 		/// Execute a command and retrieve the result set.
 		/// </summary>
-		/// <param name="DbCommand">The command.</param>
-		public static async Task<List<dynamic>> ToResultSet(this DbCommand DbCommand) {
+		/// <param name="Command">The command.</param>
+		public static async Task<List<dynamic>> AllAsync(this DbCommand Command) {
 			// Execute the reader and wait for the result.
-			using (DbDataReader DataReader = await DbCommand.ExecuteReaderAsync()) {
+			using (DbDataReader DataReader = await Command.ExecuteReaderAsync()) {
 				// Initialize a new instance of the List class.
 				List<object> Result = new List<object>();
 				// Read values from the data reader.
 				while (await DataReader.ReadAsync()) {
 					// Add the result to the result set.
-					Result.Add(DataReader.ToResult());
+					Result.Add(DataReader.Single());
 				}
 				// Return the result.
 				return Result;
+			}
+		}
+
+		/// <summary>
+		/// Execute a command and retrieve a result.
+		/// </summary>
+		/// <param name="Command">The command.</param>
+		public static async Task<T> SingleAsync<T>(this DbCommand Command) where T : class, new() {
+			// Execute the reader and wait for the result.
+			using (DbDataReader DataReader = await Command.ExecuteReaderAsync()) {
+				// Retrieve a result.
+				return await DataReader.ReadAsync() ? DataReader.Single<T>() : null;
+			}
+		}
+
+		/// <summary>
+		/// Execute a command and retrieve a result.
+		/// </summary>
+		/// <param name="Command">The command.</param>
+		public static async Task<object> SingleAsync(this DbCommand Command) {
+			// Execute the reader and wait for the result.
+			using (DbDataReader DataReader = await Command.ExecuteReaderAsync()) {
+				// Retrieve a result.
+				return await DataReader.ReadAsync() ? DataReader.Single() : null;
 			}
 		}
 	}

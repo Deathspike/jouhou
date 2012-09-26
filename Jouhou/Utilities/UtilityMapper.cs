@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Jouhou {
 	/// <summary>
-	/// Represents the data reader mapper.
+	/// Represents the object mapper.
 	/// </summary>
 	/// <typeparam name="T">The type</typeparam>
 	public static class UtilityMapper<T> {
