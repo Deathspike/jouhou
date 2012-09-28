@@ -47,7 +47,7 @@ The *DbConnectionPool* implements a connection pool. The connection pool maintai
     var Configuration = ConfigurationManager.ConnectionStrings["MyConnection"];
     
     // Instantiate a connection pool.
-    var ConnectionPool = new DbConnectionPool(Configuration.ConnectionString, Configuration.ProviderName);
+    var ConnectionPool = new ConnectionPool(Configuration.ConnectionString, Configuration.ProviderName);
     
     // Demonstrate the performance benefits of pooling ...
     for (int i = 0; i < 100; i++) {
